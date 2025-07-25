@@ -1,0 +1,76 @@
+﻿@model HealthCareConsultation.Models.Appointment
+
+@{
+    Layout = "_PublicLayout";
+    ViewBag.Title = "Book Appointment";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 mt-5">
+            <div class="card mt-5">
+                <div class="card-header bg-primary text-light">
+                    <h3 class="mb-0">Book New Appointment</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Book">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group">
+                            <label asp-for="DoctorId" class="control-label">Select Doctor</label>
+                            <select asp-for="DoctorId" class="form-control"
+                                    asp-items="@(new SelectList(ViewBag.Doctors, "Id", "FullName"))">
+                                <option value="">-- Select Doctor --</option>
+                            </select>
+                            <span asp-validation-for="DoctorId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label asp-for="AppointmentDateTime" class="control-label">Date & Time</label>
+                            <input type="datetime-local" asp-for="AppointmentDateTime" class="form-control" id="appointmentDateTime" />
+                            <span asp-validation-for="AppointmentDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label asp-for="ProblemDescription" class="control-label">Problem Description</label>
+                            <textarea asp-for="ProblemDescription" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ProblemDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <button type="submit" class="btn btn-primary">Book Appointment</button>
+                            <a asp-action="MyAppointments" class="btn btn-secondary">View My Appointments</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dateTimeField = document.getElementById('appointmentDateTime');
+
+
+            const now = new Date();
+
+            const minDate = now.toISOString().slice(0, 16);
+            dateTimeField.min = minDate;
+
+
+            dateTimeField.addEventListener('change', function () {
+                const selectedDate = new Date(this.value);
+                if (selectedDate < now) {
+                    alert('Please select a future date and time');
+                    this.value = minDate;
+                }
+            });
+        });
+    </script>
+}

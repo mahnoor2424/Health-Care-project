@@ -1,0 +1,126 @@
+﻿@using Microsoft.IdentityModel.Tokens
+
+@model AdminNotificationViewModel
+
+@{
+    ViewBag.Title = "Send Notification";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var doctors = ViewBag.Doctors as List<dynamic>;
+}
+<div class="pcoded-inner-content">
+    <div class="container">
+    <h2>Send Notification to Doctors</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+        <div class="card shadow">
+            <div class="card-body">
+                <div asp-validation-summary="All" class="text-danger fw-bold mb-3"></div>
+                   <form asp-action="Send" method="post">
+                    @Html.AntiForgeryToken()
+
+
+                    <div class="mb-3">
+                        <label for="receiverType">Receiver Type</label>
+                        <select id="receiverType" name="ReceiverType" class="form-control" required>
+                            <option value="">--Select--</option>
+                            <option value="All Doctors">All Doctors</option>
+                            <option value="Specific Doctor">Specific Doctor</option>
+                        </select>
+                    </div>
+
+                    <!-- 👇 Doctor Dropdown (Initially Hidden) -->
+                    <div class="mb-3" id="doctorDropdown" style="display: none;">
+                        <label for="SpecificDoctorId">Select Doctor</label>
+                        <select id="SpecificDoctorId" name="SpecificDoctorId" class="form-control">
+                            <option value="">-- Select Doctor --</option>
+                            @foreach (var doc in Model.Doctors)
+                            {
+                                <option value="@doc.Id">@doc.FullName</option>
+                            }
+                        </select>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        <label>Type</label>
+                        <select name="NotificationType" class="form-control" required>
+                            <option value="Info">Info</option>
+                            <option value="Success">Success</option>
+                            <option value="Warning">Warning</option>
+                            <option value="Danger">Danger</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Message</label>
+                        <textarea name="Message" class="form-control" required></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Send Notification</button>
+                    </div>
+                    </form>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h4>Recent Notifications</h4>
+            <div class="table-responsive">
+                 <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Receiver</th>
+                            <th>Type</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var n in Model.Notifications)
+                        {
+                            <tr>
+                                <td>@n.CreatedAt.ToString("g")</td>
+                                <td>
+                                    @n.ReceiverType
+                                    @if (n.SpecificDoctorId != null)
+                                    {
+                                        <small>(ID: @n.SpecificDoctorId)</small>
+                                    }
+                                </td>
+                                <td>@n.NotificationType</td>
+                                <td>@n.Message</td>
+                            </tr>
+                        }
+
+                     </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function () {
+            function toggleDoctorDropdown() {
+                const receiverType = $('#receiverType').val();
+                if (receiverType === "Specific Doctor") {
+                    $('#doctorDropdown').slideDown();
+                } else {
+                    $('#doctorDropdown').slideUp();
+                    $('#SpecificDoctorId').val('');
+                }
+            }
+
+            $('#receiverType').on('change', toggleDoctorDropdown);
+            toggleDoctorDropdown(); // Run on load (in case form reloaded)
+        });
+    </script>
+}
+
+    

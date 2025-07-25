@@ -1,0 +1,143 @@
+﻿@model HealthCareConsultation.Models.DoctorProfile
+@{
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.Title = "My Profile";
+}
+<div class="pcoded-inner-content">
+   <div class="body-page">
+        <div class="container mt-4">
+            <h2 class="mb-4">My Profile</h2>
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-success">@ViewBag.Message</div>
+            }
+
+            <form asp-action="Profile" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FullName"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="PhoneNumber"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Gender"></label>
+                        <select asp-for="Gender" class="form-control">
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Specialty"></label>
+                        <input asp-for="Specialty" class="form-control" />
+                        <span asp-validation-for="Specialty" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Qualification"></label>
+                        <input asp-for="Qualification" class="form-control" />
+                        <span asp-validation-for="Qualification" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Experience"></label>
+                        <input asp-for="Experience" class="form-control" />
+                        <span asp-validation-for="Experience" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="AvailableDays">Available Days (e.g. Mon, Wed, Fri)</label>
+                        <input asp-for="AvailableDays" class="form-control" />
+                        <span asp-validation-for="AvailableDays" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="AvailableTimeStart">Time From</label>
+                        <input asp-for="AvailableTimeStart" class="form-control" type="time" />
+                        <span asp-validation-for="AvailableTimeStart" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="AvailableTimeEnd">Time To</label>
+                        <input asp-for="AvailableTimeEnd" class="form-control" type="time" />
+                        <span asp-validation-for="AvailableTimeEnd" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Bio">Bio</label>
+                    <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Bio" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label>Profile Image</label><br />
+                    <div class="mb-3">
+                        <label>Profile Image</label><br />
+
+                        <!-- 👇 Wrap img in label to make it clickable -->
+                        <label for="profileImageInput" style="cursor: pointer;">
+                            <img id="imagePreview"
+                                 src="@Model.ProfileImage"
+                                 width="100"
+                                 height="100"
+                                 class="rounded-circle mb-2"
+                                 style="object-fit: cover;" />
+                        </label>
+
+                        <!-- 👇 Hidden file input, only triggered when image is clicked -->
+                        <input type="file"
+                               name="profileImage"
+                               id="profileImageInput"
+                               class="form-control d-none"
+                               onchange="previewImage(this)" />
+                    </div>
+
+                   
+                </div>
+
+
+                <button type="submit" class="btn btn-primary mt-2">Update Profile</button>
+            </form>
+        </div>
+   </div>
+
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
+

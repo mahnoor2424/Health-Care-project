@@ -1,0 +1,27 @@
+﻿@model IEnumerable<HealthCareConsultation.Models.Appointment>
+
+<h2>Approved Appointments</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Date & Time</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appointment in Model)
+        {
+            <tr>
+                <td>@appointment.Patient.FullName</td>
+                <td>@appointment.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt")</td>
+                <td>
+                    <a asp-controller="Prescription" asp-action="Create" asp-route-appointmentId="@appointment.Id" class="btn btn-primary">
+                        Add Prescription
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

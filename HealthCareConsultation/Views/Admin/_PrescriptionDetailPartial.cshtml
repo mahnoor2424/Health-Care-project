@@ -1,0 +1,15 @@
+﻿@model HealthCareConsultation.Models.PrescriptionModel
+
+<div>
+    <h5>Doctor: @Model.Appointment.Doctor.FullName</h5>
+    <h5>Patient: @Model.Appointment.Patient.FullName</h5>
+    <p><strong>Date:</strong> @Model.CreatedAt.ToString("yyyy-MM-dd")</p>
+    <hr />
+    <p><strong>Symptoms:</strong> @Model.Symptoms</p>
+    <p><strong>Diagnosis:</strong> @Model.Diagnosis</p>
+    <p><strong>Medicines:</strong> @Model.Medicines</p>
+    @if (!string.IsNullOrEmpty(Model.Notes))
+    {
+        <p><strong>Notes:</strong> @Model.Notes</p>
+    }
+</div>

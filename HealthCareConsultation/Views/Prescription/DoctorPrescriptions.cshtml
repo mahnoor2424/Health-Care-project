@@ -1,0 +1,52 @@
+﻿@model List<HealthCareConsultation.Models.PrescriptionModel>
+@{
+    ViewData["Title"] = "My Prescriptions";
+    Layout = "_DoctorLayout";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h4>My Prescriptions</h4>
+        </div>
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <table class="table table-bordered table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Patient</th>
+                            <th>Appointment Date</th>
+                            <th>Symptoms</th>
+                            <th>Diagnosis</th>
+                            <th>Medicines</th>
+                            <th>Created At</th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var p = Model[i];
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>@p.Appointment?.Patient?.FullName</td>
+                                <td>@p.Appointment?.AppointmentDateTime.ToString("g")</td>
+                                <td>@p.Symptoms</td>
+                                <td>@p.Diagnosis</td>
+                                <td>@p.Medicines</td>
+                                <td>@p.CreatedAt.ToString("g")</td>
+                                
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="p-3 text-muted">No prescriptions found.</div>
+            }
+        </div>
+    </div>
+</div>

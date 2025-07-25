@@ -1,0 +1,57 @@
+﻿@model HealthCareConsultation.Models.PrescriptionModel
+
+@{
+    ViewData["Title"] = "Prescription Details";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Prescription Details</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>Doctor:</strong> @Model.Appointment?.Doctor?.FullName</p>
+                    <p><strong>Patient:</strong> @Model.Appointment?.Patient?.FullName</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p><strong>Date:</strong> @Model.CreatedAt.ToString("dd MMM yyyy")</p>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="mb-3">
+                <h5 class="fw-bold">Symptoms</h5>
+                <p class="mb-0">@Model.Symptoms</p>
+            </div>
+
+            <div class="mb-3">
+                <h5 class="fw-bold">Diagnosis</h5>
+                <p class="mb-0">@Model.Diagnosis</p>
+            </div>
+
+            <div class="mb-3">
+                <h5 class="fw-bold">Medicines</h5>
+                <p class="mb-0">
+                    @Html.Raw((Model.Medicines ?? string.Empty).Replace("\n", "<br/>"))
+                </p>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Notes))
+            {
+                <div class="mb-3">
+                    <h5 class="fw-bold">Notes</h5>
+                    <p class="mb-0">@Model.Notes</p>
+                </div>
+            }
+        </div>
+
+        <div class="card-footer">
+            <a asp-action="AllPrescriptions" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+</div>

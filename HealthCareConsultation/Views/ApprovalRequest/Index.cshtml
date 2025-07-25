@@ -1,0 +1,101 @@
+﻿@model List<HealthCareConsultation.Models.DoctorProfile>
+
+@{
+    ViewBag.Title = "Doctor Approval Requests";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="pcoded-inner-content">
+    <div class="page-body">
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="card mt-3">
+
+                    <div class="card-header  text-black d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">👨‍⚕️ All Approval Requests</h5>
+                    </div>
+
+                    <div class="card-block table-responsive">
+                        <table class="table table-bordered table-hover table-striped align-middle text-center">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Photo</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Gender</th>
+                                    <th>Specialty</th>
+                                    <th>Qualification</th>
+                                    <th>Experience</th>
+                                    <th>Available Days</th>
+                                    <th>Available Time</th>
+                                    <th>Bio</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    int count = 1;
+                                    foreach (var doctor in Model)
+                                    {
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(doctor.ProfileImage))
+                                                {
+                                                    <img src="~/images/@doctor.ProfileImage"
+                                                         width="50" height="50"
+                                                         class="rounded-circle"
+                                                         alt="Doctor Image"
+                                                         onerror="this.src='/images/default-doctor.png'" />
+
+
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No Image</span>
+                                                }
+                                            </td>
+                                            <td>@doctor.FullName</td>
+                                            <td>@doctor.Email</td>
+                                            <td>@doctor.PhoneNumber</td>
+                                            <td>@doctor.Gender</td>
+                                            <td>@doctor.Specialty</td>
+                                            <td>@doctor.Qualification</td>
+                                            <td>@doctor.Experience yrs</td>
+                                            <td>@doctor.AvailableDays</td>
+                                            <td>@doctor.AvailableTimeStart?.ToString(@"hh\:mm")</td>
+                                            <td style="max-width: 180px; word-break: break-word;">@doctor.Bio</td>
+                                            <td>
+                                                <form asp-action="Approve" method="post">
+                                                    <input type="hidden" name="id" value="@doctor.Id" />
+                                                    <button type="submit" class="btn btn-success btn-sm"
+                                                            onclick="return confirm('Approve this doctor?');">
+                                                        Approve
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="13" class="text-center text-muted">
+                                            No pending doctor requests yet.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div> <!-- ✅ table-responsive wraps the table -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

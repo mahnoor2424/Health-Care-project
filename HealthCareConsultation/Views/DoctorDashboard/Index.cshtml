@@ -1,0 +1,144 @@
+﻿@model HealthCareConsultation.Models.ViewModels.DoctorDashboardVM
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "Doctor Dashboard";
+}
+<style>
+   
+    /* Purple */
+    .bg-teal {
+        background-color: #20c997 !important;
+    }
+    /* Teal   */
+    .bg-peach {
+        background-color: #ff9f68 !important;
+    }
+    /* Peach  */
+</style>
+<div class="container" style="margin-top:70px;">
+    <h2 class="text-center mb-4">Doctor Dashboard</h2>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Total Appointments</h5>
+                    <h2 class="mb-0">@Model.TotalAppointments</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Pending</h5>
+                    <h2 class="mb-0">@Model.PendingAppointments</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Approved</h5>
+                    <h2 class="mb-0">@Model.ApprovedAppointments</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Completed</h5>
+                    <h2 class="mb-0">@Model.CompletedAppointments</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <div class="card bg-danger text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Cancelled</h5>
+                    <h2 class="mb-0">@Model.CancelledAppointments</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <div class="card bg-secondary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Today's Appointments</h5>
+                    <h2 class="mb-0">@Model.TodayAppointments</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <div class="card bg-teal text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Total Prescriptions</h5>
+                    <h2 class="mb-0">@Model.TotalPrescriptions</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <div class="card bg-peach text-dark shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-1">Prescriptions last 7Days</h5>
+                    <h2 class="mb-0">@Model.Last7DaysPrescriptions</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Upcoming Appointments -->
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-dark">
+            <h4 class="mb-0">Upcoming Appointments</h4>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.UpcomingAppointments != null && Model.UpcomingAppointments.Any())
+            {
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Date/Time</th>
+                            <th>Problem</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.UpcomingAppointments)
+                        {
+                            <tr>
+                                <td>@a.Patient?.FullName</td>
+                                <td>@a.AppointmentDateTime.ToString("g")</td>
+                                <td>@(a.ProblemDescription?.Length > 40 ? a.ProblemDescription.Substring(0, 40) + "..." : a.ProblemDescription)</td>
+                                <td><span class="badge @GetStatusClass(a.Status)">@a.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="p-3">
+                    <span class="text-muted">No upcoming appointments.</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusClass(string status) => status switch
+    {
+        "Pending" => "bg-warning",
+        "Approved" => "bg-success",
+        "Completed" => "bg-primary",
+        "Cancelled" => "bg-danger",
+        _ => "bg-secondary"
+    };
+}

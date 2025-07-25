@@ -1,0 +1,27 @@
+﻿@model PrescriptionModel
+
+<div>
+    <h5>Symptoms</h5>
+    <p>@Model.Symptoms</p>
+
+    <h5>Diagnosis</h5>
+    <p>@Model.Diagnosis</p>
+
+    <h5>Medicines</h5>
+    @if (!string.IsNullOrEmpty(Model.Medicines))
+    {
+        <ul>
+            @foreach (var med in Model.Medicines.Split(','))
+            {
+                <li>@med.Trim()</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No medicines prescribed.</p>
+    }
+
+    <h5>Additional Notes</h5>
+    <p>@Model.Notes</p>
+</div>

@@ -1,0 +1,37 @@
+﻿@model HealthCareConsultation.Models.ViewModels.DoctorNotificationViewModel
+
+@{
+    ViewBag.Title = "My Notifications";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+
+<div class="container" style="margin-top:70px;">
+    <h2 class="mb-4">📬 My Notifications</h2>
+
+    @if (!Model.Notifications.Any())
+    {
+        <div class="alert alert-info">You have no notifications.</div>
+    }
+    else
+    {
+        <table class="table bg-primary table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var n in Model.Notifications)
+                {
+                    <tr>
+                        <td>@n.CreatedAt.ToString("g")</td>
+                        <td>@n.NotificationType</td>
+                        <td>@n.Message</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

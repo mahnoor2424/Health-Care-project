@@ -1,0 +1,213 @@
+﻿@model IEnumerable<Appointment>
+@{
+    ViewData["Title"] = "All Appointments";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <div class="card" style="margin-top:70px;">
+        <div class="card-header bg-primary text-white">
+            <h3>All Appointments</h3>
+        </div>
+        <div class="card-body">
+            @Html.AntiForgeryToken() <!-- Token -->
+            <div id="dynamicAlerts"></div>
+            <table class="table table-bordered" id="appointmentsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Patient</th>
+                        <th>Date/Time</th>
+                        <th>Problem</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr data-id="@item.Id">
+                            <td>@item.Doctor?.FullName</td>
+                            <td>@item.Patient?.FullName</td>
+                            <td class="appointment-date">@item.AppointmentDateTime.ToString("g")</td>
+                            <td class="problem-description">
+                                @(item.ProblemDescription?.Length > 30
+                                    ? item.ProblemDescription.Substring(0, 30) + "..."
+                                    : item.ProblemDescription)
+                            </td>
+                            <td>
+                                <span class="badge status-badge @GetStatusClass(item.Status)">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <button class="btn btn-sm btn-success approve-btn" data-id="@item.Id">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger cancel-btn" data-id="@item.Id">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    }
+                                    <button class="btn btn-sm btn-warning edit-appointment-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editAppointmentModal"
+                                            data-id="@item.Id"
+                                            data-date='@item.AppointmentDateTime.ToString("yyyy-MM-ddTHH:mm")'
+                                            data-description="@item.ProblemDescription"
+                                            data-status="@item.Status">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-btn" data-id="@item.Id">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editAppointmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Edit Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editAppointmentForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="editAppointmentId" name="Id" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="editAppointmentDate" name="AppointmentDateTime" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Problem Description</label>
+                        <textarea class="form-control" id="editAppointmentDescription" name="ProblemDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-control" id="editAppointmentStatus" name="Status">
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="submit-text">Save Changes</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            // Approve Appointment
+            $(document).on('click', '.approve-btn', function () {
+                updateStatus($(this).data('id'), "Approved");
+            });
+
+            // Cancel Appointment
+            $(document).on('click', '.cancel-btn', function () {
+                updateStatus($(this).data('id'), "Cancelled");
+            });
+
+            // Delete Appointment
+            $(document).on('click', '.delete-btn', function () {
+                const id = $(this).data('id');
+                if (confirm('Delete this appointment?')) {
+                    $.post('@Url.Action("DeleteAjax", "Appointment")', { id: id, __RequestVerificationToken: token })
+                        .done(resp => {
+                            if (resp.success) {
+                                $(`tr[data-id="${id}"]`).remove();
+                                showAlert('Appointment deleted!', 'success');
+                            } else showAlert(resp.message, 'danger');
+                        });
+                }
+            });
+
+            // Fill Edit Modal
+            $('#editAppointmentModal').on('show.bs.modal', function (e) {
+                var btn = $(e.relatedTarget);
+                $('#editAppointmentId').val(btn.data('id'));
+                $('#editAppointmentDate').val(btn.data('date'));
+                $('#editAppointmentDescription').val(btn.data('description'));
+                $('#editAppointmentStatus').val(btn.data('status'));
+            });
+
+            // Edit Form Submit
+            $('#editAppointmentForm').submit(function (e) {
+                e.preventDefault();
+                $.post('@Url.Action("EditAjax", "Appointment")', $(this).serialize())
+                    .done(resp => {
+                        if (resp.success) {
+                            let row = $(`tr[data-id="${resp.id}"]`);
+                            row.find('.appointment-date').text(resp.dateTime);
+                            row.find('.problem-description').text(resp.description);
+                            row.find('.status-badge')
+                                .text(resp.status)
+                                .attr('class', 'badge status-badge ' + resp.statusClass);
+                            $('#editAppointmentModal').modal('hide');
+                            showAlert('Appointment updated!', 'success');
+                        } else showAlert(resp.message, 'danger');
+                    });
+            });
+
+            function updateStatus(id, status) {
+                $.post('@Url.Action("UpdateStatusAjax", "Appointment")', { id: id, status: status, __RequestVerificationToken: token })
+                    .done(resp => {
+                        if (resp.success) {
+                            let row = $(`tr[data-id="${id}"]`);
+                            row.find('.status-badge')
+                                .text(resp.status)
+                                .attr('class', 'badge status-badge ' + resp.statusClass);
+                            showAlert(`Marked as ${status}!`, 'success');
+                        } else showAlert(resp.message, 'danger');
+                    });
+            }
+
+            function showAlert(message, type) {
+                $('#dynamicAlerts').html(`
+                            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                                ${message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        `);
+                setTimeout(() => $('.alert-dismissible').alert('close'), 3000);
+            }
+        });
+    </script>
+}
+
+@functions {
+    string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Pending" => "bg-warning",
+            "Approved" => "bg-success",
+            "Completed" => "bg-primary",
+            "Cancelled" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
